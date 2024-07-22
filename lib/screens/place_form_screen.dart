@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:great_places/providers/great_places.dart';
+import 'package:provider/provider.dart';
 
 import '../widgets/image_input.dart';
 
@@ -10,11 +14,23 @@ class PlaceFormScreen extends StatefulWidget {
 }
 
 class _PlaceFormScreenState extends State<PlaceFormScreen> {
-  
   final _titleController = TextEditingController();
+  File? _pickedImage;
 
-  void _submitForm(){
+  void _selectImage(File pickedImage) {
+    _pickedImage = pickedImage;
+  }
 
+  void _submitForm() {
+    if (_titleController.text.isEmpty || _pickedImage == null) {
+      return;
+    }
+
+    Provider.of<GreatPlaces>(context, listen: false).addPlace(
+      _titleController.text,
+      _pickedImage!,
+    );
+    Navigator.of(context).pop();
   }
 
   @override
@@ -24,7 +40,6 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
         title: Text('Novo Lugar'),
       ),
       body: Column(
-        
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(
@@ -40,7 +55,7 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
                       ),
                     ),
                     SizedBox(height: 10),
-                    ImageInput(),
+                    ImageInput(this._selectImage),
                   ],
                 ),
               ),
@@ -51,11 +66,10 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
             label: Text('Adicionar'),
             icon: Icon(Icons.add),
             style: ElevatedButton.styleFrom(
-              foregroundColor: Theme.of(context).colorScheme.onSecondary, 
+              foregroundColor: Theme.of(context).colorScheme.onSecondary,
               elevation: 0,
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
-            
           )
         ],
       ),
